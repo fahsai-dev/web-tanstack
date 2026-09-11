@@ -1,41 +1,14 @@
-import type {
-  SampleAPIItemResponse,
-  SampleAPIListResponse,
-} from '#/types/sampleapis/@types.ts'
+import type { SampleAPIItemResponse } from '#/types/sampleapis/@types.ts'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-
-const API_URL = 'https://api.sampleapis.com/coffee/hot'
-
-const fetchCoffeeList = createServerFn().handler(
-  async (): Promise<SampleAPIListResponse> => {
-    const response = await fetch(API_URL, {
-      headers: {
-        accept: 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch movies: ${response.statusText}`)
-    }
-
-    return response.json()
-  },
-)
+import { coffeeListQueryOptions } from '#/server/data.ts'
 
 export const Route = createFileRoute('/demo/coffee')({
-  loader: async (): Promise<{
-    coffeeList: SampleAPIListResponse
-    error: string | null
-  }> => {
-    try {
-      const data = await fetchCoffeeList()
-      return { coffeeList: data, error: null }
-    } catch (error) {
-      console.error('Error fetching:', error)
-      return { coffeeList: [], error: 'Failed to load' }
-    }
-  },
+  loader: ({ context }) =>
+    context.queryClient.query({
+      ...coffeeListQueryOptions(),
+      staleTime: 'static',
+    }),
   component: RouteComponent,
 })
 
@@ -67,21 +40,15 @@ function Card({ i }: { i: SampleAPIItemResponse }) {
 }
 
 function RouteComponent() {
-  const { coffeeList, error } = Route.useLoaderData()
+  const queryClient = useQueryClient()
+  const { data: coffeeList, isFetching } = useSuspenseQuery(
+    coffeeListQueryOptions(),
+  )
 
   return (
     <main className="demo-page demo-center">
       <div className="w-full max-w-6xl p-8 rounded-xl demo-panel">
         <h1 className="text-3xl mb-6 font-bold text-center">Popular Coffee</h1>
-
-        {error && (
-          <div
-            className="text-red-400 text-center mb-4 p-4 bg-red-900/20 rounded-lg"
-            role="alert"
-          >
-            {error}
-          </div>
-        )}
 
         {coffeeList.length > 0 ? (
           <div
@@ -93,12 +60,20 @@ function RouteComponent() {
             ))}
           </div>
         ) : (
-          !error && (
-            <div className="text-center text-gray-400" role="status">
-              Loading...
-            </div>
-          )
+          <div className="text-center text-gray-400" role="status">
+            Loading...
+          </div>
         )}
+
+        <button
+          className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition-colors disabled:opacity-50"
+          disabled={isFetching}
+          onClick={() =>
+            queryClient.invalidateQueries({ queryKey: ['coffee', 'list'] })
+          }
+        >
+          {isFetching ? 'Reloading…' : 'Reload'}
+        </button>
       </div>
     </main>
   )

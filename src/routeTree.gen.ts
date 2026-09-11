@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ApiDataRouteImport } from './routes/api/data'
 import { Route as DemoCoffeeRouteImport } from './routes/demo/coffee'
 import { Route as DemoNeonRouteImport } from './routes/demo/neon'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDataRoute = ApiDataRouteImport.update({
+  id: '/api/data',
+  path: '/api/data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoCoffeeRoute = DemoCoffeeRouteImport.update({
@@ -38,12 +44,14 @@ const DemoNeonRoute = DemoNeonRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/demo/coffee' | '/demo/neon'
+  fullPaths: '/' | '/about' | '/api/data' | '/demo/coffee' | '/demo/neon'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/demo/coffee' | '/demo/neon'
-  id: '__root__' | '/' | '/about' | '/demo/coffee' | '/demo/neon'
+  to: '/' | '/about' | '/api/data' | '/demo/coffee' | '/demo/neon'
+  id: '__root__' | '/' | '/about' | '/api/data' | '/demo/coffee' | '/demo/neon'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ApiDataRoute: typeof ApiDataRoute
   DemoCoffeeRoute: typeof DemoCoffeeRoute
   DemoNeonRoute: typeof DemoNeonRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/data': {
+      id: '/api/data'
+      path: '/api/data'
+      fullPath: '/api/data'
+      preLoaderRoute: typeof ApiDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/coffee': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ApiDataRoute: ApiDataRoute,
   DemoCoffeeRoute: DemoCoffeeRoute,
   DemoNeonRoute: DemoNeonRoute,
 }
@@ -113,10 +131,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

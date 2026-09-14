@@ -6,7 +6,7 @@ interface CallLogInput {
   consumer: LogConsumer
   path: string
   method: string
-  headers?: HeadersInit
+  headers?: unknown
   payload?: unknown
 }
 

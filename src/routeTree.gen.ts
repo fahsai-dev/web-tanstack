@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as LabRouteImport } from './routes/lab'
 import { Route as ApiDataRouteImport } from './routes/api/data'
 import { Route as DemoCoffeeRouteImport } from './routes/demo/coffee'
 import { Route as DemoNeonRouteImport } from './routes/demo/neon'
+import { Route as DemoTableRouteImport } from './routes/demo/table'
 import { Route as DemoUsemutationRouteImport } from './routes/demo/usemutation'
 
 const IndexRoute = IndexRouteImport.update({
@@ -24,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabRoute = LabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDataRoute = ApiDataRouteImport.update({
@@ -41,6 +48,11 @@ const DemoNeonRoute = DemoNeonRouteImport.update({
   path: '/demo/neon',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoTableRoute = DemoTableRouteImport.update({
+  id: '/demo/table',
+  path: '/demo/table',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoUsemutationRoute = DemoUsemutationRouteImport.update({
   id: '/demo/usemutation',
   path: '/demo/usemutation',
@@ -50,26 +62,32 @@ const DemoUsemutationRoute = DemoUsemutationRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/lab': typeof LabRoute
   '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
+  '/demo/table': typeof DemoTableRoute
   '/demo/usemutation': typeof DemoUsemutationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/lab': typeof LabRoute
   '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
+  '/demo/table': typeof DemoTableRoute
   '/demo/usemutation': typeof DemoUsemutationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/lab': typeof LabRoute
   '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
+  '/demo/table': typeof DemoTableRoute
   '/demo/usemutation': typeof DemoUsemutationRoute
 }
 export interface FileRouteTypes {
@@ -77,34 +95,42 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/lab'
     | '/api/data'
     | '/demo/coffee'
     | '/demo/neon'
+    | '/demo/table'
     | '/demo/usemutation'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/lab'
     | '/api/data'
     | '/demo/coffee'
     | '/demo/neon'
+    | '/demo/table'
     | '/demo/usemutation'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/lab'
     | '/api/data'
     | '/demo/coffee'
     | '/demo/neon'
+    | '/demo/table'
     | '/demo/usemutation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  LabRoute: typeof LabRoute
   ApiDataRoute: typeof ApiDataRoute
   DemoCoffeeRoute: typeof DemoCoffeeRoute
   DemoNeonRoute: typeof DemoNeonRoute
+  DemoTableRoute: typeof DemoTableRoute
   DemoUsemutationRoute: typeof DemoUsemutationRoute
 }
 
@@ -122,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lab': {
+      id: '/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof LabRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/data': {
@@ -145,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoNeonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/table': {
+      id: '/demo/table'
+      path: '/demo/table'
+      fullPath: '/demo/table'
+      preLoaderRoute: typeof DemoTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/usemutation': {
       id: '/demo/usemutation'
       path: '/demo/usemutation'
@@ -158,9 +198,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  LabRoute: LabRoute,
   ApiDataRoute: ApiDataRoute,
   DemoCoffeeRoute: DemoCoffeeRoute,
   DemoNeonRoute: DemoNeonRoute,
+  DemoTableRoute: DemoTableRoute,
   DemoUsemutationRoute: DemoUsemutationRoute,
 }
 export const routeTree = rootRouteImport

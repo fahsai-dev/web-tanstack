@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ApiDataRouteImport } from './routes/api/data'
 import { Route as DemoCoffeeRouteImport } from './routes/demo/coffee'
 import { Route as DemoNeonRouteImport } from './routes/demo/neon'
+import { Route as DemoUsemutationRouteImport } from './routes/demo/usemutation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const DemoNeonRoute = DemoNeonRouteImport.update({
   path: '/demo/neon',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoUsemutationRoute = DemoUsemutationRouteImport.update({
+  id: '/demo/usemutation',
+  path: '/demo/usemutation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
+  '/demo/usemutation': typeof DemoUsemutationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
+  '/demo/usemutation': typeof DemoUsemutationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,33 @@ export interface FileRoutesById {
   '/api/data': typeof ApiDataRoute
   '/demo/coffee': typeof DemoCoffeeRoute
   '/demo/neon': typeof DemoNeonRoute
+  '/demo/usemutation': typeof DemoUsemutationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/api/data' | '/demo/coffee' | '/demo/neon'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/api/data'
+    | '/demo/coffee'
+    | '/demo/neon'
+    | '/demo/usemutation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/api/data' | '/demo/coffee' | '/demo/neon'
-  id: '__root__' | '/' | '/about' | '/api/data' | '/demo/coffee' | '/demo/neon'
+  to:
+    | '/'
+    | '/about'
+    | '/api/data'
+    | '/demo/coffee'
+    | '/demo/neon'
+    | '/demo/usemutation'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/api/data'
+    | '/demo/coffee'
+    | '/demo/neon'
+    | '/demo/usemutation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +105,7 @@ export interface RootRouteChildren {
   ApiDataRoute: typeof ApiDataRoute
   DemoCoffeeRoute: typeof DemoCoffeeRoute
   DemoNeonRoute: typeof DemoNeonRoute
+  DemoUsemutationRoute: typeof DemoUsemutationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoNeonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/usemutation': {
+      id: '/demo/usemutation'
+      path: '/demo/usemutation'
+      fullPath: '/demo/usemutation'
+      preLoaderRoute: typeof DemoUsemutationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDataRoute: ApiDataRoute,
   DemoCoffeeRoute: DemoCoffeeRoute,
   DemoNeonRoute: DemoNeonRoute,
+  DemoUsemutationRoute: DemoUsemutationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,7 +1,12 @@
 import type { SampleAPIItemResponse } from '#/types/sampleapis/@types.ts'
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { coffeeListQueryOptions } from '#/server/data.ts'
+import { useState } from 'react'
+import { coffeeListQueryOptions, toggleCoffeeFavorite } from '#/server/data.ts'
 
 export const Route = createFileRoute('/demo/coffee')({
   loader: ({ context }) =>
@@ -12,7 +17,27 @@ export const Route = createFileRoute('/demo/coffee')({
   component: RouteComponent,
 })
 
-function Card({ i }: { i: SampleAPIItemResponse }) {
+function Card({
+  i,
+  isFavorited,
+  onFavoriteChange,
+}: {
+  i: SampleAPIItemResponse
+  isFavorited: boolean
+  onFavoriteChange: (id: number, favorited: boolean) => void
+}) {
+  // Own mutation instance per card, so pending/variables state can't be
+  // clobbered by clicking a different card while this one is still in flight.
+  const favoriteMutation = useMutation({
+    mutationFn: () => toggleCoffeeFavorite({ data: { id: i.id } }),
+    onSuccess: (result) => onFavoriteChange(result.id, result.favorited),
+  })
+
+  const isToggling = favoriteMutation.isPending
+  // Optimistic UI: while in flight, assume it will flip — falls back to the
+  // confirmed `isFavorited` prop automatically once the mutation settles.
+  const optimisticFavorited = isToggling ? !isFavorited : isFavorited
+
   return (
     <div
       className="bg-white/10 border border-white/20 rounded-lg overflow-hidden backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -20,7 +45,23 @@ function Card({ i }: { i: SampleAPIItemResponse }) {
       role="group"
     >
       {i.image && (
-        <img src={i.image} alt={i.title} className="w-full h-64 object-cover" />
+        <div className="relative">
+          <img
+            src={i.image}
+            alt={i.title}
+            className="w-full h-64 object-cover"
+          />
+          <button
+            type="button"
+            aria-label={optimisticFavorited ? 'Unfavorite' : 'Favorite'}
+            aria-pressed={optimisticFavorited}
+            disabled={isToggling}
+            onClick={() => favoriteMutation.mutate()}
+            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center disabled:opacity-50"
+          >
+            {optimisticFavorited ? '❤️' : '🤍'}
+          </button>
+        </div>
       )}
       <div className="p-4">
         <>
@@ -44,6 +85,19 @@ function RouteComponent() {
   const { data: coffeeList, isFetching } = useSuspenseQuery(
     coffeeListQueryOptions(),
   )
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
+
+  const handleFavoriteChange = (id: number, favorited: boolean) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev)
+      if (favorited) {
+        next.add(id)
+      } else {
+        next.delete(id)
+      }
+      return next
+    })
+  }
 
   return (
     <main className="demo-page demo-center">
@@ -56,7 +110,12 @@ function RouteComponent() {
             aria-label="Movie List"
           >
             {coffeeList.slice(0, 16).map((i: SampleAPIItemResponse) => (
-              <Card key={i.id} i={i} />
+              <Card
+                key={i.id}
+                i={i}
+                isFavorited={favoriteIds.has(i.id)}
+                onFavoriteChange={handleFavoriteChange}
+              />
             ))}
           </div>
         ) : (

@@ -22,3 +22,20 @@ export const coffeeListQueryOptions = () =>
     queryKey: ['coffee', 'list'],
     queryFn: () => fetchCoffeeList(),
   })
+
+// In-memory store for the useMutation demo — resets on server restart.
+const favoritedCoffeeIds = new Set<number>()
+
+export const toggleCoffeeFavorite = createServerFn({ method: 'POST' })
+  .inputValidator((d: { id: number }) => d)
+  .handler(async ({ data }): Promise<{ id: number; favorited: boolean }> => {
+    // Artificial delay so the useMutation loading state is visible in the demo.
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
+    if (favoritedCoffeeIds.has(data.id)) {
+      favoritedCoffeeIds.delete(data.id)
+    } else {
+      favoritedCoffeeIds.add(data.id)
+    }
+    return { id: data.id, favorited: favoritedCoffeeIds.has(data.id) }
+  })
